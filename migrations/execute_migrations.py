@@ -70,9 +70,9 @@ def executar_migrations():
         try:
             client.query(sql).result()
             registrar_migration(client, arquivo)
-            print(f"✅ Migration '{arquivo}' executada com sucesso.")
+            print(f"Migration '{arquivo}' executada com sucesso.")
         except Exception as e:
-            print(f"❌ Erro ao executar '{arquivo}': {e}")
+            print(f"Erro ao executar '{arquivo}': {e}")
             break
 
 if __name__ == "__main__":
