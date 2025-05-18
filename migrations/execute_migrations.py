@@ -12,7 +12,6 @@ TABELA_CONTROLE = os.getenv("BQ_MIGRATION_TABLE")
 PASTA_SQL = os.path.join(os.path.dirname(__file__), "sql_scripts")
 
 def criar_tabela_controle(client):
-    dataset_ref = client.dataset(DATASET_ID)
 
     # Verifica se a tabela existe usando INFORMATION_SCHEMA
     query = f"""
@@ -38,15 +37,15 @@ def criar_tabela_controle(client):
 
 def obter_migrations_executadas(client):
     query = f"""
-        SELECT nome_arquivo FROM `{PROJECT_ID}.{DATASET_ID}.{TABELA_CONTROLE}`
+        SELECT file_name FROM `{PROJECT_ID}.{DATASET_ID}.{TABELA_CONTROLE}`
     """
     result = client.query(query).result()
-    return [row.nome_arquivo for row in result]
+    return [row.file_name for row in result]
 
-def registrar_migration(client, nome_arquivo):
+def registrar_migration(client, file_name):
     query = f"""
         INSERT INTO `{PROJECT_ID}.{DATASET_ID}.{TABELA_CONTROLE}` (file_name, execution_time)
-        VALUES ('{nome_arquivo}', CURRENT_TIMESTAMP())
+        VALUES ('{file_name}', CURRENT_TIMESTAMP())
     """
     client.query(query).result()
 
