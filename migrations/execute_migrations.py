@@ -2,77 +2,77 @@ import os
 from google.cloud import bigquery
 from dotenv import load_dotenv
 
-# Carrega variáveis de ambiente do .env
+# load environment variables from .env
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
-# Configurações carregadas do .env
+# Configs loaded
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
-DATASET_ID = os.getenv("BQ_DATASET")
-TABELA_CONTROLE = os.getenv("BQ_MIGRATION_TABLE")
-PASTA_SQL = os.path.join(os.path.dirname(__file__), "sql_scripts")
+DATASET_ID = os.getenv("BQ_CONTROL_DATASET")
+CONTROL_TABLE = os.getenv("BQ_MIGRATION_TABLE")
+SQL_DIRECTORY = os.path.join(os.path.dirname(__file__), "sql_scripts")
 
-def criar_tabela_controle(client):
+def create_control_table(client):
 
-    # Verifica se a tabela existe usando INFORMATION_SCHEMA
+    # Checks if control table already exists INFORMATION_SCHEMA
     query = f"""
-        SELECT COUNT(*) AS qtd
+        SELECT COUNT(*) AS quantity
         FROM `{PROJECT_ID}.{DATASET_ID}.INFORMATION_SCHEMA.TABLES`
-        WHERE table_name = '{TABELA_CONTROLE}'
+        WHERE table_name = '{CONTROL_TABLE}'
     """
     result = client.query(query).result()
-    qtd = next(result).qtd  # Pega o valor da contagem
+    quantity = next(result).quantity 
 
-    if qtd == 1:
-        print(f"✔ Tabela de controle '{DATASET_ID}.{TABELA_CONTROLE}' já existe.")
+    if quantity == 1:
+        print(f"✔ Control table '{DATASET_ID}.{CONTROL_TABLE}' already exists in GCP.")
     else:
         ddl = f"""
-            CREATE TABLE `{PROJECT_ID}.{DATASET_ID}.{TABELA_CONTROLE}` (
+            CREATE TABLE `{PROJECT_ID}.{DATASET_ID}.{CONTROL_TABLE}` (
                 file_name STRING NOT NULL,
                 execution_time TIMESTAMP NOT NULL
             )
         """
         client.query(ddl).result()
-        print(f"✅ Tabela de controle '{DATASET_ID}.{TABELA_CONTROLE}' criada com sucesso.")
+        print(f"✅ Control table '{DATASET_ID}.{CONTROL_TABLE}' successfully created.")
 
 
-def obter_migrations_executadas(client):
+def get_executed_migrations(client):
     query = f"""
-        SELECT file_name FROM `{PROJECT_ID}.{DATASET_ID}.{TABELA_CONTROLE}`
+        SELECT file_name FROM `{PROJECT_ID}.{DATASET_ID}.{CONTROL_TABLE}`
     """
     result = client.query(query).result()
     return [row.file_name for row in result]
 
-def registrar_migration(client, file_name):
+def register_migrations(client, file_name):
     query = f"""
-        INSERT INTO `{PROJECT_ID}.{DATASET_ID}.{TABELA_CONTROLE}` (file_name, execution_time)
+        INSERT INTO `{PROJECT_ID}.{DATASET_ID}.{CONTROL_TABLE}` (file_name, execution_time)
         VALUES ('{file_name}', CURRENT_TIMESTAMP())
     """
     client.query(query).result()
 
-def executar_migrations():
+def execute_migrations():
     client = bigquery.Client(project=PROJECT_ID)
 
-    criar_tabela_controle(client)
-    executados = obter_migrations_executadas(client)
+    create_control_table(client)
+    migrations_executed = get_executed_migrations(client)
 
-    arquivos = sorted(f for f in os.listdir(PASTA_SQL) if f.endswith(".sql"))
-    for arquivo in arquivos:
-        if arquivo in executados:
-            print(f"✔ Migration '{arquivo}' já executada. Pulando.")
+    files = sorted(f for f in os.listdir(SQL_DIRECTORY) if f.endswith(".sql"))
+    for file in files:
+        if file in migrations_executed:
+            print(f"✔ Migration '{file}' already executed. skipping.")
             continue
 
-        caminho = os.path.join(PASTA_SQL, arquivo)
+        caminho = os.path.join(SQL_DIRECTORY, file)
         with open(caminho, "r", encoding="utf-8") as f:
             sql = f.read()
 
-        print(f"⏳ Executando migration '{arquivo}'...")
+        print(f"⏳ executing migration '{file}'...")
         try:
             client.query(sql).result()
-            registrar_migration(client, arquivo)
-            print(f"Migration '{arquivo}' executada com sucesso.")
+            register_migrations(client, file)
+            print(f"Migration '{file}' successfully executed.")
         except Exception as e:
-            print(f"Erro ao executar '{arquivo}': {e}")
+            print(f"ErroR executing '{file}': {e}")
             break
 
 if __name__ == "__main__":
-    executar_migrations()
+    execute_migrations()
