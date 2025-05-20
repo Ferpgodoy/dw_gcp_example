@@ -13,7 +13,7 @@ def save_json_to_gcs(bucket_name: str, folder: str, file_name: str, data: dict) 
         hook.upload(
             bucket_name=bucket_name,
             object_name=gcs_path,
-            data=json.dumps(data),
+            data='\n'.join(json.dumps(row) for row in data),
             mime_type='application/json'
         )
     except Exception as e:

@@ -3,7 +3,7 @@ from google.cloud import bigquery
 from dotenv import load_dotenv
 
 # Carrega variáveis de ambiente do .env
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "config", ".env"))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 # Configurações carregadas do .env
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")

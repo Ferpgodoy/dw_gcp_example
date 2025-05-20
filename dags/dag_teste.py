@@ -6,15 +6,16 @@ from datetime import datetime
 from ingestion.api_src.api_reader import fetch_api_data
 from ingestion.api_src.gcs_uploader import save_json_to_gcs
 from transformation.python_scripts.read_sql_scripts import read_parametized_sql
+import json
 
 
 @dag(
     schedule_interval='@daily',
-    start_date=days_ago(3),
+    start_date=days_ago(2),
     catchup=True,
     tags=['vendas'],
     default_args={
-        'retries': 1,
+        'retries': 0,
     }
 )
 def dag_api_vendas_diaria():
@@ -24,12 +25,13 @@ def dag_api_vendas_diaria():
         subfolder = f"{folder}/{data_agendamento}"
         current_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         file_name = f"{current_timestamp}_{end_file_name}.json"
-        vendas_json = fetch_api_data(url)
+        ##vendas_json = fetch_api_data(url)
+        with open('seuarquivo.json', 'r', encoding='utf-8') as f:
+            vendas_json = json.load(f)
         gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name,vendas_json)
 
         return {
             "data_agendamento": data_agendamento,
-            "folder": subfolder,
             "bucket": bucket_name,
             "file_path": gcs_path
         }
@@ -52,7 +54,7 @@ def dag_api_vendas_diaria():
         {
             "data_agendamento": "{{ ds }}",
             "bucket": "{{ ti.xcom_pull(task_ids='extrair_e_salvar_json')['bucket'] }}",
-            "folder": "{{ ti.xcom_pull(task_ids='extrair_e_salvar_json')['folder'] }}",
+            "file_path": "{{ ti.xcom_pull(task_ids='extrair_e_salvar_json')['file_path'] }}",
         },
     )
 
