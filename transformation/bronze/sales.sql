@@ -11,7 +11,7 @@ where date = '{data_agendamento}';
 
 INSERT INTO bronze.sales (date, client, product, qntd, value,status)
 SELECT
-  '{data_agendamento}',
+  {data_agendamento},
   cliente,
   produto,
   quantidade,
