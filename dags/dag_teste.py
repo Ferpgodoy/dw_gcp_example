@@ -1,17 +1,25 @@
 from airflow.decorators import dag, task
-from airflow.utils.dates import days_ago
-from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
 from datetime import datetime
 
 from ingestion.api_src.api_reader import fetch_api_data
 from ingestion.api_src.gcs_uploader import save_json_to_gcs
 from transformation.python_scripts.read_sql_scripts import read_parametized_sql
 import json
+import os
+from dotenv import load_dotenv
+from datetime import datetime, timedelta
 
+start_date = datetime.now() - timedelta(days=2)
+
+
+# load environment variables from .env
+load_dotenv()
+GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
 
 @dag(
-    schedule_interval='@daily',
-    start_date=days_ago(2),
+    schedule='@daily',
+    start_date=start_date,
     catchup=True,
     tags=['vendas'],
     default_args={
@@ -21,11 +29,11 @@ import json
 def dag_api_vendas_diaria():
 
     @task
-    def extrair_e_salvar_json(data_agendamento: str, url: str, bucket_name: str, folder: str, end_file_name: str):
+    def extrair_e_salvar_json(data_agendamento: str, url: str, bucket_name: str, folder: str):
         subfolder = f"{folder}/{data_agendamento}"
         current_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-        file_name = f"{current_timestamp}_{end_file_name}.json"
-        ##vendas_json = fetch_api_data(url)
+        file_name = f"{current_timestamp}.json"
+        ##vendas_json = fetch_api_data(url) no momento não estou usando, testando de outro jeito
         with open('seuarquivo.json', 'r', encoding='utf-8') as f:
             vendas_json = json.load(f)
         gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name,vendas_json)
@@ -38,19 +46,23 @@ def dag_api_vendas_diaria():
 
     def task_atualizar_tabela(task_id, sql_path, params):
         sql_final = read_parametized_sql(sql_path, params)
-        return BigQueryExecuteQueryOperator(
+        return BigQueryInsertJobOperator(
             task_id=task_id,
-            sql=sql_final,
-            use_legacy_sql=False,
-            location='US'  # ajuste conforme seu dataset
+            configuration={
+                "query": {
+                    "query": sql_final,
+                    "useLegacySql": False,
+                }
+            },
+            location="US",
         )
 
     # Tasks
-    dados = extrair_e_salvar_json(data_agendamento="{{ ds }}",bucket_name = "seu-bucket-gcs",folder="vendas")
+    dados = extrair_e_salvar_json(data_agendamento="{{ ds }}",url="teste",bucket_name = GCP_BUCKET_NAME,folder="sales")
 
     bronze = task_atualizar_tabela(
         "atualizar_bronze",
-        "/transformation/bronze/sales.sql",
+        "../transformation/bronze/sales.sql",
         {
             "data_agendamento": "{{ ds }}",
             "bucket": "{{ ti.xcom_pull(task_ids='extrair_e_salvar_json')['bucket'] }}",
@@ -60,13 +72,13 @@ def dag_api_vendas_diaria():
 
     silver = task_atualizar_tabela(
         "atualizar_silver",
-        "/transformation/silver/sales.sql",
+        "../transformation/silver/sales.sql",
         {"data_agendamento": "{{ ds }}"},
     )
 
     gold = task_atualizar_tabela(
         "atualizar_gold",
-        "/transformation/gold/sales.sql",
+        "../transformation/gold/sales.sql",
         {"data_agendamento": "{{ ds }}"},
     )
 
