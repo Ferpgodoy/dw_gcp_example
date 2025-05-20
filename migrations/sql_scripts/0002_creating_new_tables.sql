@@ -1,10 +1,24 @@
-CREATE TABLE `projeto-1-dw.bronze.partidas` (
-    tournament_id INT NOT NULL,
-    phase STRING NOT NULL,
-    match_id INT NOT NULL,
-    home_team_id INT NOT NULL,
-    home_team_name INT NOT NULL,
-    away_team_id INT NOT NULL,
-    away_team_name INT NOT NULL
+CREATE TABLE `projeto-1-dw.bronze.sales` (
+  date DATE NOT NULL,
+  client STRING NOT NULL,
+  product STRING NOT NULL,
+  qntd INT64 NOT NULL,
+  value NUMERIC NOT NULL,
+  status STRING NOT NULL
+);
 
-)
+CREATE TABLE `projeto-1-dw.silver.sales` (
+  date DATE NOT NULL,
+  client STRING NOT NULL,
+  product STRING NOT NULL,
+  qntd INT64 NOT NULL,
+  value NUMERIC NOT NULL,
+  status STRING NOT NULL
+);
+
+CREATE TABLE `projeto-1-dw.gold.sales_per_month` (
+  year INT64 NOT NULL,
+  month INT64 NOT NULL,
+  qntd INT64 NOT NULL,
+  value NUMERIC NOT NULL
+);
