@@ -11,10 +11,10 @@ where date = '{data_agendamento}';
 
 INSERT INTO bronze.sales (date, client, product, qntd, value,status)
 SELECT
-  {data_agendamento},
+  DATE '{data_agendamento}',
   cliente,
   produto,
   quantidade,
-  CAST(valor AS NUMERIC),
+  CAST(valor_total AS NUMERIC),
   'teste' as status
 FROM stage.sales;
