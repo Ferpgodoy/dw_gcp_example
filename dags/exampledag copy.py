@@ -19,14 +19,6 @@ GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
     tags=["exemplo"],
 )
 def dag_hello_goodbye():
-    
-    @task
-    def hello():
-        print("Hello, world!")
-    
-    @task
-    def goodbye():
-        print("Goodbye, world!")
 
     @task
     def extrair_e_salvar_json(data_agendamento: str, url: str, bucket_name: str, folder: str):
@@ -48,6 +40,7 @@ def dag_hello_goodbye():
     def atualizar_tabela(sql_path: str, parametros: dict):
         # Lê SQL parametrizado
         sql_final = read_parametized_sql(sql_path, parametros)
+        print(sql_final)
         
         # Cria cliente BigQuery
         client = bigquery.Client()
@@ -85,6 +78,6 @@ def dag_hello_goodbye():
         parametros={"data_agendamento": "{{ ds }}"},
     )
 
-    hello() >> dados >> bronze >> silver >> gold >> goodbye()
+    dados >> bronze >> silver >> gold
 
 dag_instance = dag_hello_goodbye()

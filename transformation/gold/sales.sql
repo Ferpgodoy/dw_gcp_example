@@ -1,13 +1,16 @@
-delete from gold.sales
-where year = year('{data_agendamento}')
-and month = month('{data_agendamento}');
+-- Usando uma data como string (ex: 'data_agendamento') para extrair ano e mês
+DELETE FROM gold.sales_per_month
+WHERE year = EXTRACT(YEAR FROM DATE '{data_agendamento}')
+  AND month = EXTRACT(MONTH FROM DATE '{data_agendamento}');
 
-INSERT INTO gold.sales_per_month (date, client, product, qntd, value,status)
+
+-- Insere os dados agregados
+INSERT INTO gold.sales_per_month (year,month, qntd, value)
 SELECT
-    year('{data_agendamento}'),
-    month('{data_agendamento}'),
-    sum(qntd) as qntd,
-    sum(value) as value
+  EXTRACT(YEAR FROM DATE '{data_agendamento}'),
+  EXTRACT(MONTH FROM DATE '{data_agendamento}'),
+  COALESCE(SUM(qntd),0) AS qntd,
+  COALESCE(SUM(value),0)  AS value
 FROM silver.sales
-where year(date) = year('{data_agendamento}')
-and month(date) = month('{data_agendamento}');
+WHERE EXTRACT(YEAR FROM date) = EXTRACT(year FROM DATE '{data_agendamento}')
+  AND EXTRACT(MONTH FROM date) = EXTRACT(MONTH FROM DATE '{data_agendamento}');
