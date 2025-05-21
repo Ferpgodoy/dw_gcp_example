@@ -1,8 +1,8 @@
 from airflow.decorators import dag, task
 from datetime import datetime, timedelta
-from ingestion.api_src.api_reader import fetch_api_data
-from ingestion.api_src.gcs_uploader import save_json_to_gcs
-from transformation.python_scripts.read_sql_scripts import read_parametized_sql
+from python_scripts.api_reader import fetch_api_data
+from python_scripts.gcs_uploader import save_json_to_gcs
+from python_scripts.read_sql_scripts import read_parametized_sql
 import json
 import os
 from dotenv import load_dotenv
