@@ -9,7 +9,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 DATASET_ID = os.getenv("BQ_CONTROL_DATASET")
 CONTROL_TABLE = os.getenv("BQ_MIGRATION_TABLE")
-SQL_DIRECTORY = os.path.join(os.path.dirname(__file__), "sql_scripts")
+SQL_DIRECTORY = os.path.abspath("migrations")
 
 def create_control_table(client):
 
