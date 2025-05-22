@@ -9,8 +9,7 @@ def save_json_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    data: Union[dict, list],
-    client: Optional[storage.Client] = None
+    data: Union[dict, list]
 ) -> str:
     """
     Salva dados JSON no Google Cloud Storage.
@@ -20,7 +19,7 @@ def save_json_to_gcs(
     logging.info(f"Salvando arquivo JSON {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = client or storage.Client()
+        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
         
@@ -42,14 +41,13 @@ def save_csv_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    df: pd.DataFrame,
-    client: Optional[storage.Client] = None
+    df: pd.DataFrame
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo CSV {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = client or storage.Client()
+        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -68,14 +66,13 @@ def save_xlsx_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    df: pd.DataFrame,
-    client: Optional[storage.Client] = None
+    df: pd.DataFrame
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo XLSX {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = client or storage.Client()
+        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -95,14 +92,13 @@ def save_parquet_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    df: pd.DataFrame,
-    client: Optional[storage.Client] = None
+    df: pd.DataFrame
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo Parquet {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = client or storage.Client()
+        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -115,3 +111,33 @@ def save_parquet_to_gcs(
         raise
 
     return gcs_path
+
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+
+def extract_and_save_json(schedule_date: str, url: str, bucket_name: str, folder: str):
+    subfolder = f"{folder}/{schedule_date}"
+    current_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    file_name = f"{current_timestamp}.json"
+    # vendas_json = fetch_api_data(url)  # not used in the moment, testing other parts of the code
+    with open('vendas.json', 'r', encoding='utf-8') as f:
+        sales_json = json.load(f)
+    gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name, sales_json)
+
+    return {
+        "data_agendamento": schedule_date,
+        "bucket": bucket_name,
+        "file_path": gcs_path
+    }
+
+# load environment variables from .env
+load_dotenv()
+GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
+
+dados = extract_and_save_json(
+    schedule_date="{{ ds }}",
+    url="teste",
+    bucket_name=GCP_BUCKET_NAME,
+    folder="sales"
+)
