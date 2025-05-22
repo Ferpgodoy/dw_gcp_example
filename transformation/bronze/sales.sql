@@ -7,11 +7,11 @@ OPTIONS (
 );
 
 delete from bronze.sales
-where date = '{data_agendamento}';
+where date = '{schedule_date}';
 
 INSERT INTO bronze.sales (date, client, product, qntd, value,status)
 SELECT
-  DATE '{data_agendamento}',
+  DATE '{schedule_date}',
   cliente,
   produto,
   quantidade,

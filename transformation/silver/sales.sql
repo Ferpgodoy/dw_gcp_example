@@ -1,5 +1,5 @@
 delete from silver.sales
-where date = '{data_agendamento}';
+where date = '{schedule_date}';
 
 INSERT INTO bronze.sales (date, client, product, qntd, value,status)
 SELECT
@@ -11,4 +11,4 @@ SELECT
   status
 FROM bronze.sales
 where status = 'teste'
-and date = '{data_agendamento}';
+and date = '{schedule_date}';
