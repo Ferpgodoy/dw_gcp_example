@@ -9,7 +9,12 @@ def save_json_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
+<<<<<<< HEAD
     data: Union[dict, list]
+=======
+    data: Union[dict, list],
+    client: Optional[storage.Client] = None
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
 ) -> str:
     """
     Salva dados JSON no Google Cloud Storage.
@@ -19,7 +24,11 @@ def save_json_to_gcs(
     logging.info(f"Salvando arquivo JSON {gcs_path} no bucket {bucket_name}")
 
     try:
+<<<<<<< HEAD
         client = storage.Client()
+=======
+        client = client or storage.Client()
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
         
@@ -41,13 +50,22 @@ def save_csv_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
+<<<<<<< HEAD
     df: pd.DataFrame
+=======
+    df: pd.DataFrame,
+    client: Optional[storage.Client] = None
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo CSV {gcs_path} no bucket {bucket_name}")
 
     try:
+<<<<<<< HEAD
         client = storage.Client()
+=======
+        client = client or storage.Client()
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -66,13 +84,22 @@ def save_xlsx_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
+<<<<<<< HEAD
     df: pd.DataFrame
+=======
+    df: pd.DataFrame,
+    client: Optional[storage.Client] = None
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo XLSX {gcs_path} no bucket {bucket_name}")
 
     try:
+<<<<<<< HEAD
         client = storage.Client()
+=======
+        client = client or storage.Client()
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -92,13 +119,22 @@ def save_parquet_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
+<<<<<<< HEAD
     df: pd.DataFrame
+=======
+    df: pd.DataFrame,
+    client: Optional[storage.Client] = None
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo Parquet {gcs_path} no bucket {bucket_name}")
 
     try:
+<<<<<<< HEAD
         client = storage.Client()
+=======
+        client = client or storage.Client()
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -111,6 +147,7 @@ def save_parquet_to_gcs(
         raise
 
     return gcs_path
+<<<<<<< HEAD
 
 from datetime import datetime, timedelta
 import os
@@ -141,3 +178,5 @@ dados = extract_and_save_json(
     bucket_name=GCP_BUCKET_NAME,
     folder="sales"
 )
+=======
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043

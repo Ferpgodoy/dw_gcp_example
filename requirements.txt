@@ -2,4 +2,8 @@ dotenv
 requests
 pandas
 google-cloud-bigquery
+<<<<<<< HEAD
 apache-airflow-providers-google
+=======
+apache-airflow-providers-google
+>>>>>>> 61bbb7a2205df012a8721c9d981e8803ad080043
