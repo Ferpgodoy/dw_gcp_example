@@ -1,13 +1,12 @@
 from airflow.decorators import dag, task
 from airflow.utils.task_group import TaskGroup
-from airflow.models.xcom_arg import XComArg
+from airflow.operators.python import get_current_context
 import pendulum
 from datetime import datetime, timedelta
 import logging
 import os
 from dotenv import load_dotenv
 from google.cloud import bigquery
-
 from python_scripts.api_reader import fetch_api_data
 from python_scripts.gcs_uploader import save_json_to_gcs
 from python_scripts.read_sql_scripts import read_parametized_sql
@@ -40,7 +39,8 @@ def dag_sales_update():
         execution_timeout=timedelta(minutes=30),
         doc_md="Generate fake sales data and save as JSON in GCS."
     )
-    def extract_and_save_json(context):
+    def extract_and_save_json():
+        context = get_current_context()
         schedule_date = context['ds']
         bucket_name = context['params']['bucket']
         row_count = context['params']['row_count']
@@ -85,23 +85,23 @@ def dag_sales_update():
         bronze = update_table.override(task_id="bronze")(
             sql_path="transformation/bronze/sales.sql",
             parameters={
-                "schedule_date": XComArg(dados, key="schedule_date"),
-                "bucket": XComArg(dados, key="bucket"),
-                "file_path": XComArg(dados, key="file_path"),
+                "schedule_date": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['schedule_date'] }}",
+                "bucket": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['bucket'] }}",
+                "file_path": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['file_path'] }}",
             }
         )
 
         silver = update_table.override(task_id="silver")(
             sql_path="transformation/silver/sales.sql",
             parameters={
-                "schedule_date": XComArg(dados, key="schedule_date"),
+                "schedule_date": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['schedule_date'] }}",
             }
         )
 
         gold = update_table.override(task_id="gold")(
             sql_path="transformation/gold/sales.sql",
             parameters={
-                "schedule_date": XComArg(dados, key="schedule_date"),
+                "schedule_date": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['schedule_date'] }}",
             }
         )
 
