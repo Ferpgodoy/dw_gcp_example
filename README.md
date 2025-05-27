@@ -15,12 +15,26 @@ The goal is to orchestrate data ingestion from APIs, store data in Google Cloud 
 ## 📁 Project Structure
 
 ```
-projeto_1_dw/
+projeto_1_dw/.astro
+├── .astro                  # Astro configs
+
 ├── dags/                   # Airflow DAGs
 ├── python_scripts/         # Helper Python scripts
+│   │── api_reader.py       # Generic function to read data from diverse APIs in JSON format
+│   ├── execute_migrations.py # Function that executes SQL scripts in migrations/ to version database structure
+│   ├── fetch_credentials.py # Function that uses Terraform output to update GCP credentials on config/secrets
+│   ├── gcs_uploader.py     # Diverse functions to upload different format files to GCS
+│   ├── generate_fake_data.py # Diverse functions that generate different types of fake data, e.g. sales
+│   └── read_sql_scripts.py # Python script that reads SQL scripts parametized with '{}'
 ├── transformation/         # SQL scripts for transformations (Bronze, Silver, Gold)
+│   ├── bronze/             # Ingests raw data into BigQuery with minimal transformation
+│   ├── silver/             # Cleans and filters data, handles missing values, sets schema, and normalizes column names
+│   └── gold/               # Aggregates and derives final metrics used in dashboards or reports; adds business value
+├── migrations/             # DDL (Data Definition Language) SQL scripts to version database structure
 ├── config/
 │   └── secrets/            # Credential files (not versioned)
+│   └── secrets/            # Examples of Credential files (versioned)
+├── .env                    # environment variables (not versioned)
 ├── .env.example            # Example environment variables
 ├── Dockerfile              # Docker configuration
 ├── requirements.txt        # Project dependencies
@@ -40,7 +54,9 @@ sales/
 - `<execution_date>`: The date when the DAG runs and extracts the data (format: YYYY-MM-DD).
 - `<timestamp>.json`: The JSON file containing the sales data extracted, named with the timestamp of the extraction.
 
-This structure helps organize the raw sales data by execution date and extraction time.
+This structure helps organize the raw sales data by execution date and extraction time. 
+It enables the project to retain historical files uploaded for each day, facilitating data auditing. 
+Additionally, the latest file in each folder can always be used for backfilling purposes.
 
 ## ⚙️ Prerequisites
 
@@ -73,7 +89,7 @@ Before starting, make sure you have the following installed and configured:
 5. **Create a service account in GCP**:
    - Grant the necessary permissions to access GCS and BigQuery.
    - Generate a JSON key for this account.
-   - Save the JSON key file in the `config/secrets/` folder of the project as `gcp_credentials.json`.
+   
 
 ## 🛠️ Environment Setup
 
@@ -87,6 +103,7 @@ cd projeto_1_dw
 2. **Configure environment variables**:
    - Create a `.env` file based on `.env.example`.
    - Update the variables as needed, especially those related to GCP.
+   - Save the JSON key file generated for the GCP service account in the `config/secrets/` folder of the project as `gcp_credentials.json`.
 
 3. **Start the local environment using Astro CLI**:
 
@@ -104,11 +121,13 @@ This command will build and start the required Docker containers for Airflow.
 
 ## 📄 Running the DAGs
 
-- The main DAG is `dag_sales_update`, located in the `dags/` folder.
-- The DAG performs these steps:
-  1. Generates fake sales data.
-  2. Stores the data in the `raw` GCS bucket using the folder structure described above.
-  3. Executes layered transformations in BigQuery: Bronze → Silver → Gold.
+- The primary DAG, named `dag_sales_update`, is located in the `dags/` folder.
+- This DAG performs the following steps while keeping the pipeline lightweight by updating data for only one day at a time:
+  1. Generates fake sales data for the current execution day.
+  2. Stores the generated data in the `raw` GCS bucket, following the folder structure described above.
+  3. Executes layered transformations in BigQuery, updating only the data for that specific day through the Bronze → Silver → Gold stages.
+- In case of any issues, backfill runs can be triggered to reprocess and update data for multiple days as needed.
+
 
 ## 📝 Notes
 
