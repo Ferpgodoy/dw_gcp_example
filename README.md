@@ -17,6 +17,7 @@ The goal is to orchestrate data ingestion from APIs, store data in Google Cloud 
 ```
 projeto_1_dw/
 ├── dags/                   # Airflow DAGs
+├── migrations/             # SQL scripts to version database structure
 ├── python_scripts/         # Helper Python scripts
 ├── transformation/         # SQL scripts for transformations (Bronze, Silver, Gold)
 ├── config/
