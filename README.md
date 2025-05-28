@@ -17,9 +17,7 @@ The goal is to orchestrate data ingestion from APIs, store data in Google Cloud 
 ```
 projeto_1_dw/.astro
 ├── .astro                  # Astro configs
-
 ├── dags/                   # Airflow DAGs
-├── migrations/             # SQL scripts to version database structure
 ├── python_scripts/         # Helper Python scripts
 │   │── api_reader.py       # Generic function to read data from diverse APIs in JSON format
 │   ├── execute_migrations.py # Function that executes SQL scripts in migrations/ to version database structure
@@ -34,7 +32,7 @@ projeto_1_dw/.astro
 ├── migrations/             # DDL (Data Definition Language) SQL scripts to version database structure
 ├── config/
 │   └── secrets/            # Credential files (not versioned)
-│   └── secrets/            # Examples of Credential files (versioned)
+│   └── secrets.example/    # Examples of Credential files (versioned)
 ├── .env                    # environment variables (not versioned)
 ├── .env.example            # Example environment variables
 ├── Dockerfile              # Docker configuration
