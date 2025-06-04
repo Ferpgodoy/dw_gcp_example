@@ -76,10 +76,10 @@ def dag_sales_update():
         logging.info(f"Query successfully executed. {result.total_rows} rows affected.")
         return f"Query successfully executed. {result.total_rows} rows affected."
 
-    # Extração
+    # Extraction
     dados = extract_and_save_json()
 
-    # Transformações agrupadas
+    # Grouped Transformations
     with TaskGroup("transformations", tooltip="Layers: Bronze, Silver and Gold") as transformations:
 
         bronze = update_table.override(task_id="bronze")(

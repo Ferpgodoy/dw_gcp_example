@@ -1,0 +1,6 @@
+pensar em novos exemplos de dados para construir arquitetura medalhão
+pensar em fontes de dados para consumir
+particionar/clusterizar tabelas
+construir script terraform
+construir testes/qualidade de dados
+usar dbt

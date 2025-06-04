@@ -1,5 +1,5 @@
 
-# Project 1: Data Warehouse with Airflow, Astro CLI, and GCP
+# Project: Data Warehouse with Airflow, Astro CLI, and GCP
 
 This project demonstrates building a data pipeline using Apache Airflow with Astro CLI, Docker, and Google Cloud Platform (GCP).  
 The goal is to orchestrate data ingestion from APIs, store data in Google Cloud Storage (GCS), and perform layered transformations in BigQuery following the Medallion Architecture (Bronze, Silver, and Gold).
@@ -97,8 +97,8 @@ Before starting, make sure you have the following installed and configured:
 1. **Clone the repository**:
 
 ```bash
-git clone https://github.com/Ferpgodoy/projeto_1_dw.git
-cd projeto_1_dw
+git clone https://github.com/Ferpgodoy/dw_gcp_example.git
+cd dw_gcp_example
 ```
 
 2. **Configure environment variables**:
