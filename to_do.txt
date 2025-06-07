@@ -1,5 +1,5 @@
 pensar em novos exemplos de dados para construir arquitetura medalhão
-configurar github actions (branches stage e main)
+configurar github actions - TESTAR
     configurar variables no github secrets
     yml:
         rodar .tf
@@ -10,6 +10,8 @@ construir testes/qualidade de dados
 usar dbt
 
 fontes de custo do projeto: GCS, BigQuery e Astronomer
+
+post linkedin:
 
 🇺🇸 English Version
 🚀 Kicking Off My GitHub Portfolio: GCP Data Warehouse Orchestrator
