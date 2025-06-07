@@ -1,15 +1,9 @@
 pensar em novos exemplos de dados para construir arquitetura medalhão
-configurar terraform
-    estudar workspaces do terraform - V
-    criar datasets BigQuery - V
-    criar bucket - V
-    criar service account com acesso ao BigQuery e GCS - V
-    criar senha do service account - V
-configurar github actions (branches stage e main)
+configurar github actions - TESTAR
     configurar variables no github secrets
     yml:
         rodar .tf
-        rodar execute_migrations.py - V
+        rodar execute_migrations.py
         criar env com variaveis do github secrets para o astronomer acessar
         rodar deploy Astronomer
 construir testes/qualidade de dados
@@ -17,11 +11,7 @@ usar dbt
 
 fontes de custo do projeto: GCS, BigQuery e Astronomer
 
-
-roles do service account para ativar:
-    roles/storage.admin
-    roles/bigquery.admin
-    roles/serviceusage.serviceUsageAdmin
+post linkedin:
 
 🇺🇸 English Version
 🚀 Kicking Off My GitHub Portfolio: GCP Data Warehouse Orchestrator
