@@ -1,14 +1,15 @@
 import os
 from google.cloud import bigquery
 from dotenv import load_dotenv
+from read_sql_scripts import read_parametized_sql
 
 # load environment variables from .env
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 # Configs loaded
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")
-DATASET_ID = os.getenv("BQ_CONTROL_DATASET")
-CONTROL_TABLE = os.getenv("BQ_MIGRATION_TABLE")
+DATASET_ID = "control"
+CONTROL_TABLE = "executed_migrations"
 SQL_DIRECTORY = os.path.abspath("migrations")
 
 def create_control_table(client):
@@ -56,14 +57,14 @@ def execute_migrations():
     migrations_executed = get_executed_migrations(client)
 
     files = sorted(f for f in os.listdir(SQL_DIRECTORY) if f.endswith(".sql"))
+    dict = {"PROJECT_ID": PROJECT_ID}
     for file in files:
         if file in migrations_executed:
             print(f"✔ Migration '{file}' already executed. skipping.")
             continue
 
         caminho = os.path.join(SQL_DIRECTORY, file)
-        with open(caminho, "r", encoding="utf-8") as f:
-            sql = f.read()
+        sql = read_parametized_sql(caminho,dict)
 
         print(f"⏳ executing migration '{file}'...")
         try:

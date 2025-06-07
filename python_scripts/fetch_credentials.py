@@ -1,49 +1,39 @@
 import subprocess
 from pathlib import Path
+import base64
 import sys
 
 def main():
-    script_dir = Path(__file__).resolve().parent
-    project_root = script_dir.parent
+    terraform_dir = Path(__file__).resolve().parent.parent / "infra"
 
-    secrets_dir = project_root / "config" / "secrets"
-    secrets_dir.mkdir(parents=True, exist_ok=True)
-
-    output_file = secrets_dir / "gcp_credentials.json"
-
-    # remove older file if exists
-    if output_file.exists():
-        output_file.unlink()
-
-    terraform_dir = project_root / "terraform"
+    # Executa o comando terraform para pegar o output que contém a chave em base64
     result = subprocess.run(
-        ["terraform", "output", "-raw", "service_account_email"],
+        ["terraform", "output", "-raw", "service_account_key_json"],
         cwd=terraform_dir,
         capture_output=True,
         text=True
     )
 
-    service_account_email = result.stdout.strip()
-    if not service_account_email:
-        print("Error: Terraform output 'service_account_email' is empty.", file=sys.stderr)
+    if result.returncode != 0:
+        print("Erro ao rodar terraform output:", result.stderr, file=sys.stderr)
         sys.exit(1)
 
-    cmd = [
-        "gcloud", "iam", "service-accounts", "keys", "create", str(output_file),
-        "--iam-account", service_account_email
-    ]
-
-    try:
-        subprocess.run(cmd, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing command gcloud: {e}", file=sys.stderr)
+    key_b64 = result.stdout.strip()
+    if not key_b64:
+        print("Output terraform está vazio", file=sys.stderr)
         sys.exit(1)
 
-    if output_file.exists():
-        print(f"Credentials file succesfully created at: {output_file}")
-    else:
-        print(f"Error creating Credentials file at: {output_file}", file=sys.stderr)
-        sys.exit(1)
+    key_json_bytes = base64.b64decode(key_b64)
+
+    # Caminho para salvar o arquivo json
+    secrets_path = Path(__file__).resolve().parent.parent / "config" / "secrets"
+    secrets_path.mkdir(parents=True, exist_ok=True)
+    output_file = secrets_path / "gcp_credentials.json"
+
+    with open(output_file, "wb") as f:
+        f.write(key_json_bytes)
+
+    print(f"Credencial salva em: {output_file}")
 
 if __name__ == "__main__":
     main()

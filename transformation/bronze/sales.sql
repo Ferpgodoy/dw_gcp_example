@@ -1,4 +1,4 @@
-CREATE OR REPLACE EXTERNAL TABLE stage.sales
+CREATE OR REPLACE EXTERNAL TABLE raw.sales
 OPTIONS (
   format = 'JSON',
   uris = ['gs://{bucket}/{file_path}']
@@ -49,4 +49,4 @@ SELECT
   datetime, 
   sales_rep, 
   sale_id
-FROM stage.sales;
+FROM raw.sales;

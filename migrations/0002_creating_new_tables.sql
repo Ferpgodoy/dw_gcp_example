@@ -1,4 +1,4 @@
-CREATE TABLE `projeto-1-dw.bronze.sales` (
+CREATE TABLE `{PROJECT_ID}.bronze.sales` (
   date DATE NOT NULL,
   client STRING NOT NULL,
   product STRING NOT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE `projeto-1-dw.bronze.sales` (
   status STRING NOT NULL
 );
 
-CREATE TABLE `projeto-1-dw.silver.sales` (
+CREATE TABLE `{PROJECT_ID}.silver.sales` (
   date DATE NOT NULL,
   client STRING NOT NULL,
   product STRING NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE `projeto-1-dw.silver.sales` (
   status STRING NOT NULL
 );
 
-CREATE TABLE `projeto-1-dw.gold.sales_per_month` (
+CREATE TABLE `{PROJECT_ID}.gold.sales_per_month` (
   year INT64 NOT NULL,
   month INT64 NOT NULL,
   qntd INT64 NOT NULL,
