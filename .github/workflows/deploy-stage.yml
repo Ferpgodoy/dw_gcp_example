@@ -70,7 +70,6 @@ jobs:
             backend "gcs" {
               bucket  = "${{ env.TF_BACKEND_BUCKET }}"
               prefix  = "infra"
-              region  = "${{ env.REGION }}"
             }
           }
           EOF
