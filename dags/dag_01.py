@@ -34,7 +34,7 @@ GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
 def dag_sales_update():
 
     @task(
-        retries=3,
+        retries=1,
         retry_delay=timedelta(minutes=5),
         execution_timeout=timedelta(minutes=30),
         doc_md="Generate fake sales data and save as JSON in GCS."

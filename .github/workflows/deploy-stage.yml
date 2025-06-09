@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    name: Deploy to GCP and Astronomer (Stage)
+    name: Deploy to GCP
     runs-on: ubuntu-latest
     environment: STAGE
 

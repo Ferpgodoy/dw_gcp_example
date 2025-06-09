@@ -2,3 +2,4 @@
 config/secrets/
 terraform*
 .terraform*
+backend.tf
