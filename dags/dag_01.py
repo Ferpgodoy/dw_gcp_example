@@ -11,6 +11,8 @@ from python_scripts.api_reader import fetch_api_data
 from python_scripts.gcs_uploader import save_json_to_gcs
 from python_scripts.read_sql_scripts import read_parametized_sql
 from python_scripts.generate_fake_data import generate_sales
+from google.cloud import storage
+import google.auth
 
 # Load environment variables from .env
 load_dotenv()
@@ -57,7 +59,16 @@ def dag_sales_update():
             raise ValueError("Empty data.")
 
         logging.info(f"Saving file {file_name} to gs://{bucket_name}/{subfolder}")
-        gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name, sales_json)
+
+        try:
+            # Use Astronomer Connection credentials if available
+            _, project = google.auth.default()
+            client = storage.Client(project=project)
+        except Exception as e:
+            logging.warning("Falling back to default Client() without explicit project.")
+            client = storage.Client()
+
+        gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name, sales_json, client)
 
         return {"bucket": bucket_name, "file_path": gcs_path, "schedule_date": schedule_date}
 
@@ -69,7 +80,14 @@ def dag_sales_update():
         logging.info(f"Reading SQL {sql_path} with parameters: {parameters}")
         sql_final = read_parametized_sql(sql_path, parameters)
         
-        client = bigquery.Client()
+        try:
+            # Use Astronomer Connection credentials if available
+            _, project = google.auth.default()
+            client = bigquery.Client(project=project)
+        except Exception as e:
+            logging.warning("Falling back to default BigQuery Client.")
+            client = bigquery.Client()
+
         query_job = client.query(sql_final)
         result = query_job.result()
 

@@ -11,7 +11,7 @@ PROJECT_ID = os.getenv("GCP_PROJECT_ID")
 GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
 
 def delete_all_blobs(bucket_name, prefix=None):
-    client = storage.Client(project=PROJECT_ID)
+    client = storage.Client()
     bucket = client.bucket(bucket_name)
 
     blobs = list(client.list_blobs(bucket, prefix=prefix))

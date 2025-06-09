@@ -134,17 +134,17 @@ echo "File infra/backend.tf created."
 # 1. access infra folder
 cd infra
 
+# 2. export GCP credentials location
+export GOOGLE_APPLICATION_CREDENTIALS=../config/secrets/gcp_credentials.json
+
 # 2. inicialize Terraform
 terraform init
 
-# 3. create or select project workspace
-terraform workspace new <project-id> || terraform workspace select <project-id>
-
 # 4. visualize creation plan
-terraform plan
+terraform plan -var-file=terraform.tfvars
 
 # 5. apply Terraform resource creation
-terraform apply
+terraform apply -auto-approve -var-file=terraform.tfvars
 
 ## 6. back to root folder
 cd ..

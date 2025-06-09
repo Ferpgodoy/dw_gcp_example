@@ -83,7 +83,6 @@ jobs:
         working-directory: infra
         run: |
           terraform init
-          terraform workspace new ${{ env.GCP_PROJECT_ID }} || terraform workspace select ${{ env.GCP_PROJECT_ID }}
           terraform plan -var-file=terraform.tfvars
           terraform apply -auto-approve -var-file=terraform.tfvars
 

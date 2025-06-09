@@ -3,3 +3,4 @@ config/secrets/
 terraform*
 .terraform*
 backend.tf
+**/__pycache__/
