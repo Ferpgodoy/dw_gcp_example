@@ -6,15 +6,16 @@ from datetime import datetime, timedelta
 import logging
 import os
 from dotenv import load_dotenv
-from google.cloud import bigquery
+
+from airflow.providers.google.cloud.hooks.bigquery import BigQueryHook
+from airflow.providers.google.cloud.hooks.gcs import GCSHook
+
 from python_scripts.api_reader import fetch_api_data
 from python_scripts.gcs_uploader import save_json_to_gcs
 from python_scripts.read_sql_scripts import read_parametized_sql
 from python_scripts.generate_fake_data import generate_sales
-from google.cloud import storage
-import google.auth
 
-# Load environment variables from .env
+# Load .env for local development
 load_dotenv()
 GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
 
@@ -26,8 +27,7 @@ GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
     params={"row_count": 1000, "bucket": GCP_BUCKET_NAME},
     doc_md="""
     ### DAG: Sales Update
-
-    This DAG generates fake sales data, saves it on GCS and executes transformation in three layers on BigQuery (Medallion Architecture):
+    Generates fake sales data, saves it on GCS and executes transformation in three layers on BigQuery (Medallion Architecture):
     - **Bronze**
     - **Silver**
     - **Gold**
@@ -60,15 +60,15 @@ def dag_sales_update():
 
         logging.info(f"Saving file {file_name} to gs://{bucket_name}/{subfolder}")
 
+        # Try GCSHook first (works on Astronomer)
         try:
-            # Use Astronomer Connection credentials if available
-            _, project = google.auth.default()
-            client = storage.Client(project=project)
+            gcs_client = GCSHook(gcp_conn_id="STAGE_GCP").get_conn()
         except Exception as e:
-            logging.warning("Falling back to default Client() without explicit project.")
-            client = storage.Client()
+            logging.warning("Falling back to local GCS client using default credentials.")
+            from google.cloud import storage
+            gcs_client = storage.Client()
 
-        gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name, sales_json, client)
+        gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name, sales_json, gcs_client)
 
         return {"bucket": bucket_name, "file_path": gcs_path, "schedule_date": schedule_date}
 
@@ -79,19 +79,19 @@ def dag_sales_update():
     def update_table(sql_path: str, parameters: dict):
         logging.info(f"Reading SQL {sql_path} with parameters: {parameters}")
         sql_final = read_parametized_sql(sql_path, parameters)
-        
-        try:
-            # Use Astronomer Connection credentials if available
-            _, project = google.auth.default()
-            client = bigquery.Client(project=project)
-        except Exception as e:
-            logging.warning("Falling back to default BigQuery Client.")
-            client = bigquery.Client()
 
-        query_job = client.query(sql_final)
+        # Try BigQueryHook first (works no Astronomer)
+        try:
+            bq_client = BigQueryHook(gcp_conn_id="STAGE_GCP").get_client()
+        except Exception as e:
+            logging.warning("Falling back to local BigQuery client using default credentials.")
+            from google.cloud import bigquery
+            bq_client = bigquery.Client()
+
+        query_job = bq_client.query(sql_final)
         result = query_job.result()
 
-        logging.info(f"Query successfully executed. {result.total_rows} rows affected.")
+        logging.info(f"Query executed. {result.total_rows} rows affected.")
         return f"Query successfully executed. {result.total_rows} rows affected."
 
     # Extraction
@@ -128,3 +128,4 @@ def dag_sales_update():
     dados >> transformations
 
 dag_instance = dag_sales_update()
+
