@@ -1,7 +1,9 @@
 pensar em novos exemplos de dados para construir arquitetura medalhão
+    montar scripts SQL
 configurar deploy Astronomer
+    corrigir conexão GCP
 construir testes/qualidade de dados
-construir processode CI (continuous integration)
+construir processo de CI (continuous integration)
 usar dbt
 
 fontes de custo do projeto: GCS, BigQuery e Astronomer
