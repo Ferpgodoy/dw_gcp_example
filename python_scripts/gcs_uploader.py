@@ -3,14 +3,14 @@ import json
 import logging
 from typing import Union
 import pandas as pd
-from google.cloud import storage
 
 
 def save_json_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    data: Union[dict, list]
+    data: Union[dict, list],
+    client
 ) -> str:
     """
     Salva dados JSON no Google Cloud Storage.
@@ -20,7 +20,6 @@ def save_json_to_gcs(
     logging.info(f"Salvando arquivo JSON {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -41,13 +40,13 @@ def save_csv_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    df: pd.DataFrame
+    df: pd.DataFrame,
+    client
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo CSV {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -66,13 +65,13 @@ def save_xlsx_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    df: pd.DataFrame
+    df: pd.DataFrame,
+    client
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo XLSX {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 
@@ -95,13 +94,13 @@ def save_parquet_to_gcs(
     bucket_name: str,
     folder: str,
     file_name: str,
-    df: pd.DataFrame
+    df: pd.DataFrame,
+    client
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
     logging.info(f"Salvando arquivo Parquet {gcs_path} no bucket {bucket_name}")
 
     try:
-        client = storage.Client()
         bucket = client.bucket(bucket_name)
         blob = bucket.blob(gcs_path)
 

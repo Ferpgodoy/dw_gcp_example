@@ -91,29 +91,66 @@ cd dw_gcp_example
 
 2. **Configure environment variables**:
    - Create a `.env` file based on `.env.example`.
-   - Create a `terraform.tfvars` file based on `example.tvars`.
    - Update the variables as needed.
    - Save the JSON key file generated for the GCP service account in the `config/secrets/` folder of the project as `gcp_credentials.json`.
 
-3. **Create Resources with Terraform**:
+4. **Setup backend for Terraform**:
+```bash
+# Load environment variables from .env file
+export $(grep -v '^#' .env | xargs)
+
+# Ensure the backend bucket exists
+echo "Checking if bucket $TF_BACKEND_BUCKET exists..."
+if ! gsutil ls -b gs://$TF_BACKEND_BUCKET > /dev/null 2>&1; then
+  echo "Bucket does not exist. Creating..."
+  gsutil mb -p $GCP_PROJECT_ID -l $REGION gs://$TF_BACKEND_BUCKET
+else
+  echo "Bucket already exists."
+fi
+
+# Create terraform.tfvars file
+cat <<EOF > infra/terraform.tfvars
+project_id  = "$GCP_PROJECT_ID"
+gcp_key = "../config/secrets/gcp_credentials.json"
+bucket = "$GCP_BUCKET_NAME"
+region = "$REGION"
+EOF
+echo "File infra/terraform.tfvars created."
+
+# Create backend.tf file
+cat <<EOF > infra/backend.tf
+terraform {
+  backend "gcs" {
+    bucket  = "$TF_BACKEND_BUCKET"
+    prefix  = "infra"
+  }
+}
+EOF
+echo "File infra/backend.tf created."
+```
+
+4. **Create Resources with Terraform**:
 ```bash
 # 1. access infra folder
 cd infra
 
+# 2. export GCP credentials location
+export GOOGLE_APPLICATION_CREDENTIALS=../config/secrets/gcp_credentials.json
+
 # 2. inicialize Terraform
 terraform init
 
-# 3. create or select project workspace
-terraform workspace new <project-id> || terraform workspace select <project-id>
-
 # 4. visualize creation plan
-terraform plan
+terraform plan -var-file=terraform.tfvars
 
 # 5. apply Terraform resource creation
-terraform apply
+terraform apply -auto-approve -var-file=terraform.tfvars
+
+## 6. back to root folder
+cd ..
 ```
 
-4. **Start the local environment using Astro CLI**:
+5. **Start the local environment using Astro CLI**:
 
 ```bash
 astro dev start
@@ -121,7 +158,7 @@ astro dev start
 
 This command will build and start the required Docker containers for Airflow.
 
-5. **Access the Airflow UI**:
+6. **Access the Airflow UI**:
    - Go to [http://localhost:8080](http://localhost:8080)
    - Default credentials:
      - User: `admin`

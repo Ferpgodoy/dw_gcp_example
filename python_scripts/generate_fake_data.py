@@ -1,8 +1,6 @@
 import random
-import json
 from faker import Faker
 from datetime import datetime, timedelta
-import sys
 import uuid
 
 fake = Faker('en_US')
@@ -108,3 +106,66 @@ def generate_sales(date_str, count=100):
         sales.append(sale)
 
     return sales
+
+def generate_product_reviews(date_str, count=100):
+    base_date = datetime.strptime(date_str, "%Y-%m-%d")
+
+    ratings = [1, 2, 3, 4, 5]
+    review_titles = [
+        "Excellent product", "Not what I expected", "Value for money", "Highly recommend", 
+        "Could be better", "Will buy again", "Terrible experience", "Just okay", "Loved it", "Disappointed"
+    ]
+    reviews = []
+
+    for _ in range(count):        
+        time_offset = timedelta(
+            hours=random.randint(0, 23),
+            minutes=random.randint(0, 59),
+            seconds=random.randint(0, 59)
+        )
+        datetime_of_sale = base_date + time_offset
+        review = {
+            "review_id": str(uuid.uuid4()),
+            "customer_id": str(uuid.uuid4()),
+            "product_id": str(uuid.uuid4()),
+            "rating": random.choice(ratings),
+            "review_title": random.choice(review_titles),
+            "review_text": fake.paragraph(nb_sentences=3),
+            "review_date_time": datetime_of_sale.strftime("%Y-%m-%d %H:%M:%S"),
+            "verified_purchase": random.choice([True, False])
+        }
+        reviews.append(review)
+
+    return reviews
+
+
+def generate_site_sessions(date_str, count=100):
+    base_date = datetime.strptime(date_str, "%Y-%m-%d")
+
+    referral_sources = ['Google', 'Facebook', 'Direct', 'Email', 'Instagram', 'Referral']
+    device_types = ['Mobile', 'Desktop', 'Tablet']
+
+    sessions = []
+
+    for _ in range(count):
+        time_offset = timedelta(
+            hours=random.randint(0, 21),
+            minutes=random.randint(0, 59),
+            seconds=random.randint(0, 59)
+        )
+        start_time = base_date + time_offset
+        duration_minutes = random.randint(1, 120)
+        end_time = start_time + timedelta(minutes=duration_minutes)
+        session = {
+            "session_id": str(uuid.uuid4()),
+            "customer_id": str(uuid.uuid4()),
+            "start_time": start_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "end_time": end_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "device_type": random.choice(device_types),
+            "referral_source": random.choice(referral_sources),
+            "pages_viewed": random.randint(1, 20),
+            "converted": random.choice([True, False])
+        }
+        sessions.append(session)
+
+    return sessions

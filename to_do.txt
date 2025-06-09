@@ -1,42 +1,9 @@
 pensar em novos exemplos de dados para construir arquitetura medalhão
-configurar github actions - TESTAR
-    configurar variables no github secrets
-    yml:
-        rodar .tf
-        rodar execute_migrations.py
-        criar env com variaveis do github secrets para o astronomer acessar
-        rodar deploy Astronomer
+    montar scripts SQL
+configurar deploy Astronomer
+    corrigir conexão GCP
 construir testes/qualidade de dados
+construir processo de CI (continuous integration)
 usar dbt
 
 fontes de custo do projeto: GCS, BigQuery e Astronomer
-
-post linkedin:
-
-🇺🇸 English Version
-🚀 Kicking Off My GitHub Portfolio: GCP Data Warehouse Orchestrator
-
-To start building my data engineering portfolio on GitHub, I’ve been working on a project that combines:
-
-• 🌐 Google Cloud Platform (GCP)
-• 🧠 BigQuery
-• ⚙️ Apache Airflow (with Astronomer)
-• 🏛️ Medallion Architecture (Bronze, Silver, Gold)
-
-The goal is to orchestrate end-to-end data pipelines — from ingesting API data into Google Cloud Storage (raw layer, multiple formats) to running parameterized SQL transformations in BigQuery across the medallion layers.
-
-I started the project with a simple sales table model (using fake data), and I plan to evolve it gradually — including DBT in the next stages for better transformation management and modularization, and Terraform for more robust infrastructure deployment.
-
-Python scripts support the ingestion and transformation logic, including:
-🔹 API data extraction
-🔹 Fake data generation
-🔹 GCS ingestion in multiple formats
-🔹 DDL migration control
-🔹 Parameterized SQL execution
-
-📂 Repo: https://github.com/Ferpgodoy/dw_gcp_example
-
-The project is still in progress, and I’d love to hear your thoughts.
-💬 I’m open to feedback — and feel free to use it if it helps you. I'm here to learn and share!
-
-#DataEngineering #GCP #BigQuery #Airflow #Python #DBT #Terraform #MedallionArchitecture #OpenSource #PortfolioProject #CloudData
