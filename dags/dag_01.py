@@ -38,23 +38,23 @@ def dag_sales_update():
         bronze = execute_sql.override(task_id="bronze")(
             sql_path="transformation/bronze/sales.sql",
             parameters={
-                "schedule_date": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['schedule_date'] }}",
-                "bucket": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['bucket'] }}",
-                "file_path": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['file_path'] }}",
+                "schedule_date": dados['schedule_date'],
+                "bucket": dados['bucket'],
+                "file_path": dados['file_path'],
             }
         )
 
         silver = execute_sql.override(task_id="silver")(
             sql_path="transformation/silver/sales.sql",
             parameters={
-                "schedule_date": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['schedule_date'] }}",
+                "schedule_date": dados['schedule_date'],
             }
         )
 
         gold = execute_sql.override(task_id="gold")(
             sql_path="transformation/gold/sales.sql",
             parameters={
-                "schedule_date": "{{ ti.xcom_pull(task_ids='extract_and_save_json')['schedule_date'] }}",
+                "schedule_date": dados['schedule_date'],
             }
         )
 
