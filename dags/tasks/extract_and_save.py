@@ -56,7 +56,7 @@ def extract_and_save_json(data_type: str, url: str = None) -> dict:
 
     # Try GCSHook first (works on Astronomer Cloud)
     try:
-        gcs_client = GCSHook(gcp_conn_id="STAGE_GCP").get_conn()
+        gcs_client = GCSHook(gcp_conn_id="GCP_CONN").get_conn()
     except Exception:
         logging.warning("Falling back to local GCS client using default credentials.")
         from google.cloud import storage

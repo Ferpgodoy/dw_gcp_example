@@ -12,10 +12,10 @@ jobs:
     environment: PRD
 
     env:
-      GCP_PROJECT_ID: ${{ secrets.PRD_GCP_PROJECT_ID }}
-      GCP_BUCKET_NAME: ${{ secrets.PRD_GCP_BUCKET_NAME }}
-      REGION: ${{ secrets.PRD_REGION }}
-      TF_BACKEND_BUCKET: ${{ secrets.PRD_TF_BACKEND_BUCKET }}
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      GCP_BUCKET_NAME: ${{ secrets.GCP_BUCKET_NAME }}
+      REGION: ${{ secrets.REGION }}
+      TF_BACKEND_BUCKET: ${{ secrets.TF_BACKEND_BUCKET }}
 
     steps:
       - name: Checkout repo
@@ -33,12 +33,12 @@ jobs:
       - name: Configure GCP credentials
         run: |
           mkdir -p config/secrets
-          echo '${{ secrets.PRD_GCP_CREDENTIALS_JSON }}' > config/secrets/gcp_credentials.json
+          echo '${{ secrets.GCP_CREDENTIALS_JSON }}' > config/secrets/gcp_credentials.json
 
       - name: Authenticate with GCP
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: '${{ secrets.PRD_GCP_CREDENTIALS_JSON }}'
+          credentials_json: '${{ secrets.GCP_CREDENTIALS_JSON }}'
 
       - name: Setup gcloud SDK
         uses: google-github-actions/setup-gcloud@v1

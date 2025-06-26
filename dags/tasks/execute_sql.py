@@ -14,7 +14,7 @@ def execute_sql(sql_path: str, parameters: dict):
     sql_final = read_parametized_sql(sql_path, parameters)
     # Try BigQueryHook first (works no Astronomer)
     try:
-        bq_client = BigQueryHook(gcp_conn_id="STAGE_GCP").get_client()
+        bq_client = BigQueryHook(gcp_conn_id="GCP_CONN").get_client()
     except Exception:
         logging.warning("Falling back to local BigQuery client using default credentials.")
         from google.cloud import bigquery
