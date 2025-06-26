@@ -5,7 +5,7 @@ OPTIONS (
 );
 
 DELETE FROM bronze.sales
-WHERE DATE = '{schedule_date}';
+WHERE DATE = '{schedule_date}'; 
 
 
 INSERT INTO bronze.sales (
