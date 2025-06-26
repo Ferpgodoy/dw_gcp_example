@@ -2,8 +2,8 @@ from airflow.decorators import dag
 from airflow.utils.task_group import TaskGroup
 import pendulum
 
-from tasks.extract_and_save import extract_and_save_json
-from tasks.execute_sql import execute_sql
+from dags.tasks.extract_and_save import extract_and_save_json
+from dags.tasks.execute_sql import execute_sql
 
 import os
 from dotenv import load_dotenv
