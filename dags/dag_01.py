@@ -1,24 +1,19 @@
 from airflow.decorators import dag
 from airflow.utils.task_group import TaskGroup
+from airflow.models import Variable
 import pendulum
-
-from dags.tasks.extract_and_save import extract_and_save_json
-from dags.tasks.execute_sql import execute_sql
-
 import os
 from dotenv import load_dotenv
 
-# Load .env for local development
-load_dotenv()
-GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
-
+from dags.tasks.extract_and_save import extract_and_save_json
+from dags.tasks.execute_sql import execute_sql
 
 @dag(
     schedule='@daily',
     start_date=pendulum.datetime(2024, 5, 20, tz="America/Sao_Paulo"),
     catchup=False,
     tags=["example"],
-    params={"row_count": 1000, "bucket": GCP_BUCKET_NAME},
+    params={"row_count": 1000},
     doc_md="""
     ### DAG: Sales Update
     Generates fake sales data, saves it on GCS and executes transformation in three layers on BigQuery (Medallion Architecture):
@@ -29,10 +24,10 @@ GCP_BUCKET_NAME = os.getenv("GCP_BUCKET_NAME")
 )
 def dag_sales_update():
 
-    # Extraction
-    dados = extract_and_save_json("sales")
+    # Extract and save JSON to GCS
+    dados = extract_and_save_json(data_type="sales")
 
-    # Grouped Transformations
+    # Define grouped transformations using TaskGroup
     with TaskGroup("transformations", tooltip="Layers: Bronze, Silver and Gold") as transformations:
 
         bronze = execute_sql.override(task_id="bronze")(
@@ -58,9 +53,12 @@ def dag_sales_update():
             }
         )
 
+        # Define task dependencies within the transformation group
         bronze >> silver >> gold
 
+    # Define task dependency between extraction and transformation
     dados >> transformations
 
 
+# Instantiate the DAG
 dag_instance = dag_sales_update()
