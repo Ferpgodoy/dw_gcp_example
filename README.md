@@ -19,20 +19,22 @@ The goal is to orchestrate data ingestion from APIs, store data in Google Cloud 
 projeto_1_dw/.astro
 ├── .astro                    # Astro configs
 ├── .github                   # Github Actions, with workflows for stage and prd
+│   └── workflows/  
 ├── dags/                     # Airflow DAGs
 │   └── tasks/                # Contains Airflow Tasks
-├── python_scripts/           # Helper Python scripts
-│   │── api_reader.py         # Generic function to read data from diverse APIs in JSON format
-│   │── api_reader.py         # Function to delete blobs in GCS
-│   ├── execute_migrations.py # Function that executes SQL scripts in migrations/ to version database structure
-│   ├── fetch_credentials.py  # Function that uses Terraform output to update GCP credentials on config/secrets
-│   ├── gcs_uploader.py       # Diverse functions to upload different format files to GCS
-│   ├── generate_fake_data.py # Diverse functions that generate different types of fake data, e.g. sales
-│   └── read_sql_scripts.py   # Python script that reads SQL scripts parametized with '{}'
-├── transformation/           # SQL scripts for transformations (Bronze, Silver, Gold)
-│   ├── bronze/               # Ingests raw data into BigQuery with minimal transformation
-│   ├── silver/               # Cleans and filters data, handles missing values, sets schema, and normalizes column names
-│   └── gold/                 # Aggregates and derives final metrics used in dashboards or reports; adds business value
+├── include/  
+│   ├── python_scripts/           # Helper Python scripts
+│   │   │── api_reader.py         # Generic function to read data from diverse APIs in JSON format
+│   │   │── api_reader.py         # Function to delete blobs in GCS
+│   │   ├── execute_migrations.py # Function that executes SQL scripts in migrations/ to version database structure
+│   │   ├── fetch_credentials.py  # Function that uses Terraform output to update GCP credentials on config/secrets
+│   │   ├── gcs_uploader.py       # Diverse functions to upload different format files to GCS
+│   │   ├── generate_fake_data.py # Diverse functions that generate different types of fake data, e.g. sales
+│   │   └── read_sql_scripts.py   # Python script that reads SQL scripts parametized with '{}'
+│   └── transformation/           # SQL scripts for transformations (Bronze, Silver, Gold)
+│       ├── bronze/               # Ingests raw data into BigQuery with minimal transformation
+│       ├── silver/               # Cleans and filters data, handles missing values, sets schema, and normalizes column names
+│       └── gold/                 # Aggregates and derives final metrics used in dashboards or reports; adds business value
 ├── infra/
 │   │── main.tf               # Defines the core infrastructure resources
 │   └── variables.tf          # Declares reusable input variables and their types

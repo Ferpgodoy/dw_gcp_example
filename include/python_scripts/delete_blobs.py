@@ -4,7 +4,7 @@ from google.cloud import storage
 import sys
 
 # Load environment variables from .env file
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../..", ".env"))
 
 # Loaded configuration
 PROJECT_ID = os.getenv("GCP_PROJECT_ID")

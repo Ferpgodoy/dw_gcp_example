@@ -5,3 +5,4 @@ google-cloud-bigquery
 faker
 pendulum
 apache-airflow-providers-google
+openpyxl

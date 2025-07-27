@@ -1,7 +1,7 @@
 provider "google" {
   credentials = file(var.gcp_key)
-  project = var.project_id
-  region  = var.region
+  project     = var.project_id
+  region      = var.region
 }
 
 resource "google_project_service" "storage" {
@@ -15,14 +15,14 @@ resource "google_project_service" "bigquery" {
 }
 
 resource "google_project_service" "cloudresourcemanager" {
-  service = "cloudresourcemanager.googleapis.com"
-  project = var.project_id
+  service            = "cloudresourcemanager.googleapis.com"
+  project            = var.project_id
   disable_on_destroy = false
 }
 
 resource "google_storage_bucket" "raw_bucket" {
-  name     = var.bucket
-  location = var.region
+  name          = var.bucket
+  location      = var.region
   force_destroy = true
 }
 

@@ -1,15 +1,13 @@
 from airflow.decorators import task
 from airflow.operators.python import get_current_context
 from airflow.providers.google.cloud.hooks.gcs import GCSHook
-from airflow.models import Variable
+from airflow.sdk import Variable
 from datetime import datetime, timedelta
 import logging
-import os
-from dotenv import load_dotenv
 
-from python_scripts.generate_fake_data import generate_sales, generate_product_reviews, generate_site_sessions
-from python_scripts.gcs_uploader import save_json_to_gcs
-from python_scripts.api_reader import fetch_api_data
+from include.python_scripts.generate_fake_data import generate_sales, generate_product_reviews, generate_site_sessions
+from include.python_scripts.gcs_uploader import save_json_to_gcs
+from include.python_scripts.api_reader import fetch_api_data
 
 @task(
     retries=1,
@@ -31,13 +29,7 @@ def extract_and_save_json(data_type: str, url: str = None) -> dict:
     schedule_date = context['ds']
     row_count = context['params']['row_count']
     
-    try:
-        bucket_name = Variable.get("GCP_BUCKET_NAME")
-    except Exception:
-        load_dotenv()
-        bucket_name = os.getenv("GCP_BUCKET_NAME")
-        if not bucket_name:
-            raise ValueError("GCP_BUCKET_NAME not found in Airflow Variables or .env")
+    bucket_name = Variable.get("GCP_BUCKET_NAME")
 
     folder = data_type
     subfolder = f"{folder}/{schedule_date}"
@@ -55,12 +47,7 @@ def extract_and_save_json(data_type: str, url: str = None) -> dict:
         raise ValueError(f"No {data_type} data generated/obtained.")
 
     # Try GCSHook first (works on Astronomer Cloud)
-    try:
-        gcs_client = GCSHook(gcp_conn_id="GCP_CONN").get_conn()
-    except Exception:
-        logging.warning("Falling back to local GCS client using default credentials.")
-        from google.cloud import storage
-        gcs_client = storage.Client()
+    gcs_client = GCSHook(gcp_conn_id="GCP_CONN").get_conn()
 
     gcs_path = save_json_to_gcs(bucket_name, subfolder, file_name, json, gcs_client)
 

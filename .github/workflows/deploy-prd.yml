@@ -88,5 +88,5 @@ jobs:
 
       - name: Run migrations
         run: |
-          python python_scripts/execute_migrations.py
+          python include/python_scripts/execute_migrations.py
 

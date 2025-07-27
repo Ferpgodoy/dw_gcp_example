@@ -1,7 +1,7 @@
 pensar em novos exemplos de dados para construir arquitetura medalhão
     montar scripts SQL
 construir testes/qualidade de dados
-construir processo de CI (continuous integration)
+construir processo de CI (continuous integration) - menos importante
 usar dbt 
 
 fontes de custo do projeto: GCS, BigQuery e Astronomer
