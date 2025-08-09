@@ -1,5 +1,6 @@
-pensar em novos exemplos de dados para construir arquitetura medalhão
-    montar scripts SQL
+terminar modelagem dados de eleições
+    criar dimensão unificada de candidatos (agregando eleições de anos diferentes para comparação)
+    criar camada gold
 construir testes/qualidade de dados
 construir processo de CI (continuous integration) - menos importante
 usar dbt 
