@@ -54,9 +54,15 @@ def dag_elections():
         "voting_section_details": "voting_section_details"
     }
 
+    gold_files = {
+        "voting_percentages_per_city": "voting_percentages_per_city",
+        "candidates": "candidates"
+    }
+
     # Tasks creation
     bronze_tasks = make_tasks("bronze", bronze_files)
     silver_tasks = make_tasks("silver", silver_files)
+    gold_tasks = make_tasks("gold", gold_files)
 
     # Dependencies
     year >> list(bronze_tasks.values())
@@ -69,5 +75,8 @@ def dag_elections():
     [bronze_tasks["voting_section_details"]] >> silver_tasks["voting_section_details"]
     [bronze_tasks["electorate_profile"]] >> silver_tasks["electorate_profile"]
     [bronze_tasks["positions"]] >> silver_tasks["positions"]
+
+    silver_tasks["voting_section_details"] >> gold_tasks["voting_percentages_per_city"]
+    silver_tasks["candidates"] >> gold_tasks["candidates"]
 
 dag_elections()
