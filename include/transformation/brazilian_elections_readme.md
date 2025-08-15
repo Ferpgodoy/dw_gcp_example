@@ -14,7 +14,7 @@ For each dataset, only the latest CSV per year is ingested into BRONZE via an ex
 
 ## BRONZE Layer
 
-The BRONZE layer creates external tables over the latest snapshots of raw CSV files. This layer ingests the data without transformations and keeps the raw structure intact. All BRONZE tables are accessed via external tables under the `raw` schema.
+The BRONZE layer creates external tables over the latest snapshots of raw CSV files. This layer ingests the data without transformations and keeps the raw structure intact. All BRONZE tables are ingested after accessing GCS CSV files via external tables under the `raw` schema.
 
 ## SILVER Layer
 
