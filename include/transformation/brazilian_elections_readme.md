@@ -49,60 +49,49 @@ The GOLD layer produces analytics-ready tables, often unifying multiple SILVER t
 | GOLD   | gold.voting_results               | silver.voting_section_details                                         |
 
 ## Architecture Diagram
-
 ```mermaid
 flowchart TD
-    subgraph RAW[RAW Layer]
-        direction TB
-        A[candidates.csv] -->|latest snapshot per year| B[BRONZE Layer]
-        A2[candidate_assets.csv] --> B
-        A3[candidate_social_media.csv] --> B
-        A4[revocation_reason.csv] --> B
-        A5[positions.csv] --> B
-        A6[electorate_profile.csv] --> B
-        A7[voting_section_details.csv] --> B
-    end
+    %% BRONZE
+    bronze_candidates["bronze.candidates"]
+    bronze_candidate_assets["bronze.candidate_assets"]
+    bronze_candidate_social_media["bronze.candidate_social_media"]
+    bronze_revocation_reason["bronze.revocation_reason"]
+    bronze_positions["bronze.positions"]
+    bronze_electorate_profile["bronze.electorate_profile"]
+    bronze_voting_section_details["bronze.voting_section_details"]
 
-    subgraph BRONZE[BRONZE Layer]
-        direction TB
-        B --> C[SILVER Layer]
-    end
+    %% SILVER
+    silver_candidates["silver.candidates"]
+    silver_candidate_assets["silver.candidate_assets"]
+    silver_candidate_social_media["silver.candidate_social_media"]
+    silver_revocation_reason["silver.revocation_reason"]
+    silver_positions["silver.positions"]
+    silver_electorate_profile["silver.electorate_profile"]
+    silver_voting_section_details["silver.voting_section_details"]
 
-    subgraph SILVER[SILVER Layer]
-        direction TB
-        C1[silver.candidates] --> D[GOLD Layer]
-        C2[silver.candidate_assets] --> D
-        C3[silver.candidate_social_media] --> D
-        C4[silver.revocation_reason] --> D
-        C5[silver.positions] --> D
-        C6[silver.electorate_profile] --> D
-        C7[silver.voting_section_details] --> D
-    end
+    %% GOLD
+    gold_candidates_scd["gold.candidates_scd"]
+    gold_candidates_unified["gold.candidates_unified"]
+    gold_positions["gold.positions"]
+    gold_electorate_profile_aggregated["gold.electorate_profile_aggregated"]
+    gold_voting_results["gold.voting_results"]
 
-    subgraph GOLD[GOLD Layer]
-        direction TB
-        D1[gold.candidates_scd]
-        D2[gold.candidates_unified]
-        D3[gold.positions]
-        D4[gold.electorate_profile_aggregated]
-        D5[gold.voting_results]
-    end
+    %% RELAÇÕES BRONZE -> SILVER
+    bronze_candidates --> silver_candidates
+    bronze_candidate_assets --> silver_candidate_assets
+    bronze_candidate_social_media --> silver_candidate_social_media
+    bronze_revocation_reason --> silver_revocation_reason
+    bronze_positions --> silver_positions
+    bronze_electorate_profile --> silver_electorate_profile
+    bronze_voting_section_details --> silver_voting_section_details
 
-    B --> C1
-    B --> C2
-    B --> C3
-    B --> C4
-    B --> C5
-    B --> C6
-    B --> C7
+    %% RELAÇÕES SILVER -> GOLD
+    silver_candidates --> gold_candidates_scd
+    silver_candidate_assets --> gold_candidates_scd
+    silver_candidate_social_media --> gold_candidates_scd
+    silver_revocation_reason --> gold_candidates_scd
 
-    C1 --> D1
-    C2 --> D1
-    C3 --> D1
-    C4 --> D1
-    D1 --> D2
-    C5 --> D3
-    C6 --> D4
-    C7 --> D5
-```
-
+    gold_candidates_scd --> gold_candidates_unified
+    silver_positions --> gold_positions
+    silver_electorate_profile --> gold_electorate_profile_aggregated
+    silver_voting_section_details --> gold_voting_results
