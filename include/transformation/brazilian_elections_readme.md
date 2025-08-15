@@ -26,31 +26,57 @@ The GOLD layer produces analytics-ready tables, often unifying multiple SILVER t
 
 ## Table Reference
 
-| Layer  | Table Name                        | Upstream Tables (Source)                                              |
-|--------|----------------------------------|-----------------------------------------------------------------------|
-| BRONZE | bronze.candidates                 | GCS CSV snapshot (accessed by external table under raw schema)       |
-| BRONZE | bronze.candidate_assets           | GCS CSV snapshot (accessed by external table under raw schema)       |
-| BRONZE | bronze.candidate_social_media     | GCS CSV snapshot (accessed by external table under raw schema)       |
-| BRONZE | bronze.revocation_reason          | GCS CSV snapshot (accessed by external table under raw schema)       |
-| BRONZE | bronze.positions                  | GCS CSV snapshot (accessed by external table under raw schema)       |
-| BRONZE | bronze.electorate_profile         | GCS CSV snapshot (accessed by external table under raw schema)       |
-| BRONZE | bronze.voting_section_details     | GCS CSV snapshot (accessed by external table under raw schema)       |
-| SILVER | silver.candidates                 | bronze.candidates                                                     |
-| SILVER | silver.candidate_assets           | bronze.candidate_assets                                               |
-| SILVER | silver.candidate_social_media     | bronze.candidate_social_media                                         |
-| SILVER | silver.revocation_reason          | bronze.revocation_reason                                              |
-| SILVER | silver.positions                  | bronze.positions                                                      |
-| SILVER | silver.electorate_profile         | bronze.electorate_profile                                             |
-| SILVER | silver.voting_section_details     | bronze.voting_section_details                                         |
-| GOLD   | gold.candidates_scd               | silver.candidates, silver.candidate_assets, silver.candidate_social_media, silver.revocation_reason |
-| GOLD   | gold.candidates_unified           | gold.candidates_scd                                                   |
-| GOLD   | gold.positions                    | silver.positions                                                      |
-| GOLD   | gold.electorate_profile_aggregated | silver.electorate_profile                                           |
-| GOLD   | gold.voting_results               | silver.voting_section_details                                         |
+| Layer  | Table Name                        | Upstream Tables (Source)                                              | Table Type      |
+|--------|----------------------------------|-----------------------------------------------------------------------|----------------|
+| RAW    | raw.candidates                    | GCS CSV snapshot file (consulta_cand dataset)                                     | External Table |
+| RAW    | raw.candidate_assets              | GCS CSV snapshot file (bem_candidato dataset)                                     | External Table |
+| RAW    | raw.candidate_social_media        | GCS CSV snapshot file (rede_social_candidato dataset)                                     | External Table |
+| RAW    | raw.revocation_reason             | GCS CSV snapshot file (motivo_cassacao dataset)                                     | External Table |
+| RAW    | raw.positions                     | GCS CSV snapshot file (consulta_vagas dataset)                                     | External Table |
+| RAW    | raw.electorate_profile            | GCS CSV snapshot file (perfil_eleitorado dataset)                                     | External Table |
+| RAW    | raw.voting_section_details        | GCS CSV snapshot file (detalhe_votacao_secao dataset)                                     | External Table |
+| BRONZE | bronze.candidates                 | raw.candidates                                                        | Table          |
+| BRONZE | bronze.candidate_assets           | raw.candidate_assets                                                  | Table          |
+| BRONZE | bronze.candidate_social_media     | raw.candidate_social_media                                            | Table          |
+| BRONZE | bronze.revocation_reason          | raw.revocation_reason                                                 | Table          |
+| BRONZE | bronze.positions                  | raw.positions                                                         | Table          |
+| BRONZE | bronze.electorate_profile         | raw.electorate_profile                                                | Table          |
+| BRONZE | bronze.voting_section_details     | raw.voting_section_details                                            | Table          |
+| SILVER | silver.candidates                 | bronze.candidates                                                     | Table          |
+| SILVER | silver.candidate_assets           | bronze.candidate_assets                                               | Table          |
+| SILVER | silver.candidate_social_media     | bronze.candidate_social_media                                         | Table          |
+| SILVER | silver.revocation_reason          | bronze.revocation_reason                                              | Table          |
+| SILVER | silver.positions                  | bronze.positions                                                      | Table          |
+| SILVER | silver.electorate_profile         | bronze.electorate_profile                                             | Table          |
+| SILVER | silver.voting_section_details     | bronze.voting_section_details                                         | Table          |
+| GOLD   | gold.candidates_scd               | silver.candidates, silver.candidate_assets, silver.candidate_social_media, silver.revocation_reason | Table |
+| GOLD   | gold.candidates_unified           | gold.candidates_scd                                                   | Table          |
+| GOLD   | gold.positions                    | silver.positions                                                      | Table          |
+| GOLD   | gold.electorate_profile_aggregated | silver.electorate_profile                                           | Table          |
+| GOLD   | gold.voting_results               | silver.voting_section_details                                         | Table          |
+
 
 ## Architecture Diagram
 ```mermaid
 flowchart TD
+    %% GCS
+    GCS_CAND["GCS CSV snapshot (consulta_cand)"]
+    GCS_ASSETS["GCS CSV snapshot (bem_candidato)"]
+    GCS_SOCIAL["GCS CSV snapshot (rede_social_candidato)"]
+    GCS_REVOCATION["GCS CSV snapshot (motivo_cassacao)"]
+    GCS_POSITIONS["GCS CSV snapshot (consulta_vagas)"]
+    GCS_PROFILE["GCS CSV snapshot (perfil_eleitorado)"]
+    GCS_VOTING["GCS CSV snapshot (detalhe_votacao_secao)"]
+
+    %% RAW
+    raw_candidates["raw.candidates"]
+    raw_candidate_assets["raw.candidate_assets"]
+    raw_candidate_social_media["raw.candidate_social_media"]
+    raw_revocation_reason["raw.revocation_reason"]
+    raw_positions["raw.positions"]
+    raw_electorate_profile["raw.electorate_profile"]
+    raw_voting_section_details["raw.voting_section_details"]
+
     %% BRONZE
     bronze_candidates["bronze.candidates"]
     bronze_candidate_assets["bronze.candidate_assets"]
@@ -75,6 +101,24 @@ flowchart TD
     gold_positions["gold.positions"]
     gold_electorate_profile_aggregated["gold.electorate_profile_aggregated"]
     gold_voting_results["gold.voting_results"]
+
+    %% RELAÇÕES GCS -> RAW
+    GCS_CAND --> raw_candidates
+    GCS_ASSETS --> raw_candidate_assets
+    GCS_SOCIAL --> raw_candidate_social_media
+    GCS_REVOCATION --> raw_revocation_reason
+    GCS_POSITIONS --> raw_positions
+    GCS_PROFILE --> raw_electorate_profile
+    GCS_VOTING --> raw_voting_section_details
+
+    %% RELAÇÕES RAW -> BRONZE
+    raw_candidates --> bronze_candidates
+    raw_candidate_assets --> bronze_candidate_assets
+    raw_candidate_social_media --> bronze_candidate_social_media
+    raw_revocation_reason --> bronze_revocation_reason
+    raw_positions --> bronze_positions
+    raw_electorate_profile --> bronze_electorate_profile
+    raw_voting_section_details --> bronze_voting_section_details
 
     %% RELAÇÕES BRONZE -> SILVER
     bronze_candidates --> silver_candidates
