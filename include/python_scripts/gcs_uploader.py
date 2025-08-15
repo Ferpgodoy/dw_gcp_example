@@ -13,11 +13,11 @@ def save_json_to_gcs(
     client
 ) -> str:
     """
-    Salva dados JSON no Google Cloud Storage.
-    `data` pode ser um dict ou uma lista de dicts.
+    Saves JSON data at Google Cloud Storage.
+    `data` can be a dict or a list of dicts.
     """
     gcs_path = f"{folder}/{file_name}"
-    logging.info(f"Salvando arquivo JSON {gcs_path} no bucket {bucket_name}")
+    logging.info(f"Saving JSON file {gcs_path} at bucket {bucket_name}")
 
     try:
         bucket = client.bucket(bucket_name)
@@ -30,7 +30,7 @@ def save_json_to_gcs(
 
         blob.upload_from_string(json_data, content_type='application/json')
     except Exception as e:
-        logging.error(f"Erro ao fazer upload JSON no GCS: {str(e)}")
+        logging.error(f"Error uploading JSON at GCS: {str(e)}")
         raise
 
     return gcs_path
@@ -44,7 +44,7 @@ def save_csv_to_gcs(
     client
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
-    logging.info(f"Salvando arquivo CSV {gcs_path} no bucket {bucket_name}")
+    logging.info(f"Saving CSV file {gcs_path} at bucket {bucket_name}")
 
     try:
         bucket = client.bucket(bucket_name)
@@ -55,7 +55,7 @@ def save_csv_to_gcs(
         blob.upload_from_string(csv_buffer.getvalue(), content_type='text/csv')
 
     except Exception as e:
-        logging.error(f"Erro ao fazer upload CSV no GCS: {str(e)}")
+        logging.error(f"Error uploading CSV at GCS: {str(e)}")
         raise
 
     return gcs_path
@@ -69,7 +69,7 @@ def save_xlsx_to_gcs(
     client
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
-    logging.info(f"Salvando arquivo XLSX {gcs_path} no bucket {bucket_name}")
+    logging.info(f"Saving XLSX file {gcs_path} at bucket {bucket_name}")
 
     try:
         bucket = client.bucket(bucket_name)
@@ -84,7 +84,7 @@ def save_xlsx_to_gcs(
         )
 
     except Exception as e:
-        logging.error(f"Erro ao fazer upload XLSX no GCS: {str(e)}")
+        logging.error(f"Error uploading XLSX at GCS: {str(e)}")
         raise
 
     return gcs_path
@@ -98,7 +98,7 @@ def save_parquet_to_gcs(
     client
 ) -> str:
     gcs_path = f"{folder}/{file_name}"
-    logging.info(f"Salvando arquivo Parquet {gcs_path} no bucket {bucket_name}")
+    logging.info(f"Saving Parquet file {gcs_path} at bucket {bucket_name}")
 
     try:
         bucket = client.bucket(bucket_name)
@@ -109,7 +109,7 @@ def save_parquet_to_gcs(
         blob.upload_from_string(parquet_buffer.getvalue(), content_type='application/octet-stream')
 
     except Exception as e:
-        logging.error(f"Erro ao fazer upload Parquet no GCS: {str(e)}")
+        logging.error(f"Error uploading Parquet at GCS: {str(e)}")
         raise
 
     return gcs_path

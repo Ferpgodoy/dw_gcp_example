@@ -30,7 +30,7 @@ def dag_elections():
         """Dynamic creates layer's tasks."""
         tasks = {}
         for name, sql_file in files.items():
-            tasks[name] = execute_sql.override(task_id=f"{name}_{layer}")(
+            tasks[name] = execute_sql.override(task_id=f"{layer}_{name}")(
                 sql_path=f"../../include/transformation/{layer}/{sql_file}.sql",
                 parameters={"year": year}
             )
@@ -48,7 +48,10 @@ def dag_elections():
     }
 
     silver_files = {
+        "candidate_assets": "candidate_assets",
         "candidates": "candidates",
+        "candidate_social_media": "candidate_social_media",
+        "revocation_reason": "revocation_reason",
         "electorate_profile": "electorate_profile",
         "positions": "positions",
         "voting_section_details": "voting_section_details"
@@ -56,7 +59,11 @@ def dag_elections():
 
     gold_files = {
         "voting_percentages_per_city": "voting_percentages_per_city",
-        "candidates": "candidates"
+        "candidates_scd": "candidates_scd",
+        "candidates_unified": "candidates_unified",
+        "electorate_profile_aggregated": "electorate_profile_aggregated",
+        "positions": "positions",
+        "voting_percentages_per_city": "voting_percentages_per_city"
     }
 
     # Tasks creation
@@ -67,16 +74,22 @@ def dag_elections():
     # Dependencies
     year >> list(bronze_tasks.values())
 
-    [bronze_tasks["candidate_assets"], 
-     bronze_tasks["candidates"],
-     bronze_tasks["candidate_social_media"],
-     bronze_tasks["revocation_reason"]] >> silver_tasks["candidates"]
+    bronze_tasks["candidate_assets"] >> silver_tasks["candidate_assets"]
+    bronze_tasks["candidate_social_media"] >> silver_tasks["candidate_social_media"]
+    bronze_tasks["revocation_reason"] >> silver_tasks["revocation_reason"]
+    bronze_tasks["electorate_profile"] >> silver_tasks["electorate_profile"]
+    bronze_tasks["positions"] >> silver_tasks["positions"]
+    bronze_tasks["voting_section_details"] >> silver_tasks["voting_section_details"]
+    bronze_tasks["candidates"] >> silver_tasks["candidates"]
 
-    [bronze_tasks["voting_section_details"]] >> silver_tasks["voting_section_details"]
-    [bronze_tasks["electorate_profile"]] >> silver_tasks["electorate_profile"]
-    [bronze_tasks["positions"]] >> silver_tasks["positions"]
-
+    silver_tasks["candidate_assets"] >> gold_tasks["candidates_scd"]
+    silver_tasks["candidates"] >> gold_tasks["candidates_scd"]
+    silver_tasks["candidate_social_media"] >> gold_tasks["candidates_scd"]
+    silver_tasks["revocation_reason"] >> gold_tasks["candidates_scd"]
+    silver_tasks["electorate_profile"] >> gold_tasks["electorate_profile_aggregated"]
+    silver_tasks["positions"] >> gold_tasks["positions"]
     silver_tasks["voting_section_details"] >> gold_tasks["voting_percentages_per_city"]
-    silver_tasks["candidates"] >> gold_tasks["candidates"]
+
+    gold_tasks["candidates_scd"] >> gold_tasks["candidates_unified"]
 
 dag_elections()

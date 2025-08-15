@@ -49,23 +49,6 @@ projeto_1_dw/.astro
 └── README.md                 # Project documentation
 ```
 
-## ☁️ Raw Bucket Folder Structure
-
-The raw data is stored in the GCS bucket with the following folder structure:
-
-```
-sales/
-  └── <execution_date>/
-        └── <timestamp>.json
-```
-
-- `<execution_date>`: The date when the DAG runs and extracts the data (format: YYYY-MM-DD).
-- `<timestamp>.json`: The JSON file containing the sales data extracted, named with the timestamp of the extraction.
-
-This structure helps organize the raw sales data by execution date and extraction time. 
-It enables the project to retain historical files uploaded for each day, facilitating data auditing. 
-Additionally, the latest file in each folder can always be used for backfilling purposes.
-
 ## ⚙️ Prerequisites
 
 Before starting, make sure you have the following installed and configured:
@@ -172,6 +155,29 @@ This command will build and start the required Docker containers for Airflow.
      - User: `admin`
      - Password: `admin`
 
+## 📬 Contact
+
+For questions or suggestions, please reach out:
+
+- GitHub: [@Ferpgodoy](https://github.com/Ferpgodoy)
+
+## ☁️ Raw Bucket Folder Structure
+
+The raw data is stored in the GCS bucket with the following folder structure:
+
+```
+sales/
+  └── <execution_date>/
+        └── <timestamp>.json
+```
+
+- `<execution_date>`: The date when the DAG runs and extracts the data (format: YYYY-MM-DD).
+- `<timestamp>.json`: The JSON file containing the sales data extracted, named with the timestamp of the extraction.
+
+This structure helps organize the raw sales data by execution date and extraction time. 
+It enables the project to retain historical files uploaded for each day, facilitating data auditing. 
+Additionally, the latest file in each folder can always be used for backfilling purposes.
+
 ## 📄 Running the DAGs
 
 - The primary DAG, named `dag_sales_update`, is located in the `dags/dag_01.py` file.
@@ -180,17 +186,3 @@ This command will build and start the required Docker containers for Airflow.
   2. Stores the generated data in the `raw` GCS bucket, following the folder structure described above.
   3. Executes layered transformations in BigQuery, updating only the data for that specific day through the Bronze → Silver → Gold stages.
 - In case of any issues, backfill runs can be triggered to reprocess and update data for multiple days as needed.
-
-
-## 📝 Notes
-
-- The `terraform/` directory is present but not configured yet.
-- Ensure the GCP credential JSON file is correctly placed in `config/secrets/` and referenced properly in environment variables.
-- Verify the service account has sufficient permissions for GCS and BigQuery to avoid permission issues.
-
-## 📬 Contact
-
-For questions or suggestions, please reach out:
-
-- GitHub: [@Ferpgodoy](https://github.com/Ferpgodoy)
-

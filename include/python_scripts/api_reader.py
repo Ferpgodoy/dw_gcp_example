@@ -9,7 +9,7 @@ def fetch_api_data(
     body: Optional[dict] = None,
     timeout: int = 10
 ) -> dict:
-    logging.info(f"Requisição {method.upper()} para API: {url}")
+    logging.info(f"{method.upper()} Request to API: {url}")
 
     try:
         response = requests.request(
@@ -25,10 +25,10 @@ def fetch_api_data(
         return response.json()
 
     except requests.RequestException as e:
-        logging.error(f"Erro na requisição HTTP: {str(e)}")
+        logging.error(f"HTTP Request error: {str(e)}")
         raise
 
     except ValueError as e:
-        logging.error(f"Erro ao interpretar JSON da resposta: {str(e)}")
+        logging.error(f"Error reading JSON: {str(e)}")
         raise
 
