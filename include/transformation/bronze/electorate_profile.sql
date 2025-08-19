@@ -4,7 +4,7 @@ DECLARE table_exists BOOL;
 CREATE OR REPLACE EXTERNAL TABLE raw.electorate_profile
 OPTIONS (
   format = 'CSV',
-  uris = ['gs://projeto_1_dw_raw/eleicoes/perfil_eleitorado/{year}/*.csv'],
+  uris = ['gs://{bucket_name}/eleicoes/perfil_eleitorado/{year}/*.csv'],
   skip_leading_rows = 1,
   field_delimiter = ';',
   allow_quoted_newlines = TRUE,

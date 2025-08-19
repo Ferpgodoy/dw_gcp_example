@@ -49,7 +49,7 @@ IF NOT table_exists THEN
 -- If the table exists, delete all data and insert new data
 ELSE
 
-  DELETE FROM gold.candidates_unified;
+  TRUNCATE TABLE gold.candidates_unified;
 
   INSERT INTO gold.candidates_unified
 

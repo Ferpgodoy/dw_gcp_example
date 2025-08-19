@@ -1,4 +1,5 @@
 from airflow.decorators import dag, task
+from airflow.sdk import Variable
 from airflow.operators.python import get_current_context
 import pendulum
 from dags.tasks.execute_sql import execute_sql
@@ -30,9 +31,12 @@ def dag_elections():
         """Dynamic creates layer's tasks."""
         tasks = {}
         for name, sql_file in files.items():
+            parameters = {"year": year}
+            if layer == "bronze":
+                parameters["bucket_name"] = Variable.get("GCP_BUCKET_NAME")
             tasks[name] = execute_sql.override(task_id=f"{layer}_{name}")(
                 sql_path=f"../../include/transformation/{layer}/{sql_file}.sql",
-                parameters={"year": year}
+                parameters=parameters
             )
         return tasks
 
